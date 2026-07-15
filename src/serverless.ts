@@ -1,17 +1,16 @@
 import { NestFactory } from '@nestjs/core';
-import { AppModule } from '../src/app.module';
+import { AppModule } from './app.module';
 import { ValidationPipe } from '@nestjs/common';
 import { ExpressAdapter } from '@nestjs/platform-express';
-import express from 'express';
+import express = require('express');
 
-const server = express();
-
+const expressApp = express();
 let cachedApp: any;
 
 async function bootstrap() {
   if (cachedApp) return cachedApp;
 
-  const app = await NestFactory.create(AppModule, new ExpressAdapter(server));
+  const app = await NestFactory.create(AppModule, new ExpressAdapter(expressApp));
 
   app.useGlobalPipes(new ValidationPipe({ whitelist: true, transform: true }));
 
@@ -55,5 +54,5 @@ async function bootstrap() {
 
 export default async function handler(req: any, res: any) {
   await bootstrap();
-  server(req, res);
+  expressApp(req, res);
 }
